@@ -1,11 +1,17 @@
 class Contact < ApplicationRecord
-  scope :over_18, -> { self.where('birthdate > ?', 18.years.ago ) }
 
-  def author
-    'Danilo Peres'
-  end
+  #Validations
+  validates_presence_of :kind
 
-  def as_json(options = {})
-    super(methods: :author, root: true)
+  # Associations
+  belongs_to :kind #, optional: true
+  has_many :phones
+
+  accepts_nested_attributes_for :phones, allow_destroy: true
+
+  def as_json(options={})
+    h = super(options)
+    h[:birthdate] = (I18n.l(self.birthdate) unless self.birthdate.blank?)
+    h
   end
 end
